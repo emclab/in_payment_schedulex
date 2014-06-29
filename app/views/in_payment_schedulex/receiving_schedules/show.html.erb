@@ -1,0 +1,53 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+  <% else %>
+<div id="main_body">
+
+<h4><%= t(@title) %></h4>
+
+<p>
+  <b><%= t('Contract#') %></b>
+  <%= @contract.id %>
+</p>
+<p>
+  <b><%= t('Amount') %></b>
+  <%= number_with_precision(@receiving_schedule.amount, :precision => 2) %>
+</p>
+<p>
+  <b><%= t('Pay Date') %></b>
+  <%= @receiving_schedule.pay_date %>
+</p>
+<p>
+  <b><%= t('Paid Percentage%') %></b>
+  <%= @receiving_schedule.paid_percentage %>%
+</p>
+<p>
+  <b><%= t('Last Updated By') %></b>
+  <%= @receiving_schedule.last_updated_by.name if @receiving_schedule.last_updated_by_id.present? %>
+</p>
+<p>
+    <b><%= t('Brief Note') %></b>
+    <%= @receiving_schedule.brief_note %>
+</p>
+<p>
+  <b><%= t('Log') %></b>
+  <% Commonx::Log.where('resource_id = ? AND resource_name = ?', @receiving_schedule.id, params[:controller].sub('/', '_')).order("created_at DESC").each do |t| %>
+    <li><%= t.created_at.strftime("%Y/%m/%d") %>,&nbsp; <%= t.last_updated_by.name %>,&nbsp; <%= t.log %></li>
+  <% end %>
+</p>
+  
+  <table class="table table-striped">
+	  <tr>
+	    <th>
+			<%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :id => 'close', :class => BUTTONS_CLS['action'] %>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    	    <%= link_to t('New Log'), SUBURI + commonx.new_log_path(:resource_id => @receiving_schedule.id, :resource_name => params[:controller], :subaction => 'pay_receiving_schedule',
+    	     :format => :js), :remote => true, :id => 'new_log_link' , :class => BUTTONS_CLS['action'] if has_action_right?('create_pay_receiving_schedule', 'commonx/logs') %>
+       </th>
+  </tr>
+</table>
+
+</div>
+
+<% end %>

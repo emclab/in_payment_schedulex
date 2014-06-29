@@ -1,0 +1,16 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: @erb_code %>
+  
+  <% else %>
+<%= simple_form_for(@receiving_schedule) do |f| %>
+    <%= f.input :contract_id, :label => t('Contract#'), :readonly => true, :input_html => {:value => @contract.id} %>
+    <%= f.input :pay_date, :label => t('Pay Date'), :as => :string %>
+    <%= f.input :amount, :label => t('Payment Amount($)') %>
+    <%= f.input :brief_note,:label => t('Brief Note') %>
+
+    <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action']  %>
+    <%= f.button :submit, t('Save'), :class => BUTTONS_CLS['action'] %>
+<% end %>
+
+<% end %>
+
