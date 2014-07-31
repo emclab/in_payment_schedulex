@@ -17,7 +17,7 @@ module InPaymentSchedulex
       
       @cust = FactoryGirl.create(:kustomerx_customer)
       @cust1 = FactoryGirl.create(:kustomerx_customer, :name => 'new new', :short_name => 'n new')
-      @contract = FactoryGirl.create(:multi_item_contractx_contract, :void => false, :last_updated_by_id => @u.id, :customer_id => @cust.id, :contract_num => 'a new one')
+      @contract = FactoryGirl.create(:multi_item_contractx_contract, :void => false, :last_updated_by_id => @u.id, :sales_id => @u.id, :customer_id => @cust.id, :contract_num => 'a new one')
       @contract1 = FactoryGirl.create(:multi_item_contractx_contract, :void => false, :last_updated_by_id => @u.id, :customer_id => @cust1.id)
     end
       
@@ -65,12 +65,12 @@ module InPaymentSchedulex
     describe "GET 'create'" do
       it "redirect for a successful creation" do
         user_access = FactoryGirl.create(:user_access, :action => 'create', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "")
+        :sql_code => "record.sales_id == session[:user_id]")
         session[:employee] = true
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.attributes_for(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id)
-        get 'create' , {:use_route => :in_payment_schedulex,  :receiving_schedule => qs, :contract_id => @contract.id}
+        get 'create' , {:use_route => :in_payment_schedulex,  :receiving_schedule => qs, :contract_id => @contract.id, :parent_record_id => @contract.id, :parent_resource => 'multi_item_contractx/contracts'}
         response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       end
       
