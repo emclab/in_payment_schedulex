@@ -7,9 +7,9 @@ module InPaymentSchedulex
                     :contract_id_noupdate,
                     :as => :role_update
     
-    attr_accessor :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :paid_percentage_s, :time_frame_s, :paid_out_s
+    attr_accessor :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :paid_percentage_s, :time_frame_s, :paid_out_s, :sales_id_s
 
-    attr_accessible :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :time_frame_s, :paid_percentage_s, :paid_out_s,
+    attr_accessible :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :time_frame_s, :paid_percentage_s, :paid_out_s, :sales_id_s,
                     :as => :role_search_stats
                                     
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
