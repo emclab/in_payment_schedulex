@@ -31,5 +31,15 @@ module InPaymentSchedulex
       p = FactoryGirl.build(:in_payment_schedulex_receiving_schedule, :contract_id => 0)
       p.should_not be_valid
     end
+    
+    it "should be OK if paid_percentage is 60" do
+      p = FactoryGirl.build(:in_payment_schedulex_receiving_schedule, :paid_percentage => 60)
+      p.should be_valid
+    end
+    
+    it "should be not OK if paid_percentage is 160" do
+      p = FactoryGirl.build(:in_payment_schedulex_receiving_schedule, :paid_percentage => 160)
+      p.should_not be_valid
+    end
   end
 end
