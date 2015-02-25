@@ -1,9 +1,10 @@
-require 'spec_helper'
+require 'rails_helper'
 
 module InPaymentSchedulex
-  describe ReceivingSchedulesController do
+  RSpec.describe ReceivingSchedulesController, type: :controller do
+    routes {InPaymentSchedulex::Engine.routes}
     before(:each) do
-      controller.should_receive(:require_signin)
+      expect(controller).to receive(:require_signin)
     end
     before(:each) do
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
@@ -26,26 +27,26 @@ module InPaymentSchedulex
     describe "GET 'index'" do
       it "returns all payments for regular user" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "InPaymentSchedulex::ReceivingSchedule.scoped.order('pay_date DESC, paid_percentage')")
+        :sql_code => "InPaymentSchedulex::ReceivingSchedule.all.order('pay_date DESC, paid_percentage')")
         session[:employee] = true
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract.id)
         qs1 = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract1.id)
-        get 'index' , {:use_route => :in_payment_schedulex}
-        assigns(:receiving_schedules).should =~ [qs, qs1]       
+        get 'index' 
+        expect(assigns(:receiving_schedules)).to match_array([qs, qs1])      
       end
       
       it "should return payments for the project" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "InPaymentSchedulex::ReceivingSchedule.scoped.order('pay_date DESC, paid_percentage')")
+        :sql_code => "InPaymentSchedulex::ReceivingSchedule.all.order('pay_date DESC, paid_percentage')")
         session[:employee] = true
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule,  :last_updated_by_id => @u.id, :contract_id => @contract.id)
         qs1 = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract1.id)
-        get 'index' , {:use_route => :in_payment_schedulex, :contract_id => @contract.id}
-        assigns(:receiving_schedules).should eq([qs])
+        get 'index' , {:contract_id => @contract.id}
+        expect(assigns(:receiving_schedules)).to match_array([qs])
       end
     end
   
@@ -56,8 +57,8 @@ module InPaymentSchedulex
         session[:employee] = true
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        get 'new' , {:use_route => :in_payment_schedulex, :contract_id => @contract.id}
-        response.should be_success
+        get 'new' , {:contract_id => @contract.id}
+        expect(response).to be_success
       end
       
     end
@@ -70,8 +71,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.attributes_for(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id)
-        get 'create' , {:use_route => :in_payment_schedulex,  :receiving_schedule => qs, :contract_id => @contract.id, :parent_record_id => @contract.id, :parent_resource => 'multi_item_contractx/contracts'}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+        get 'create' , { :receiving_schedule => qs, :contract_id => @contract.id, :parent_record_id => @contract.id, :parent_resource => 'multi_item_contractx/contracts'}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       end
       
       it "should render 'new' if data error" do
@@ -81,8 +82,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.attributes_for(:in_payment_schedulex_receiving_schedule, :amount => nil, :contract_id => @contract.id)
-        get 'create' , {:use_route => :in_payment_schedulex, :receiving_schedule => qs, :contract_id => @contract1.id}
-        response.should render_template("new")
+        get 'create' , {:receiving_schedule => qs, :contract_id => @contract1.id}
+        expect(response).to render_template("new")
       end
     end
   
@@ -95,8 +96,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id)
-        get 'edit' , {:use_route => :in_payment_schedulex, :id => qs.id, :contract_id => @contract1.id}
-        response.should be_success
+        get 'edit' , {:id => qs.id, :contract_id => @contract1.id}
+        expect(response).to be_success
       end
       
     end
@@ -110,8 +111,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule)
-        get 'update' , {:use_route => :in_payment_schedulex, :id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:brief_note => 'true'}}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        get 'update' , {:id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:brief_note => 'true'}}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       end
       
       it "should render 'new' if data error" do
@@ -121,8 +122,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule)
-        get 'update' , {:use_route => :in_payment_schedulex, :id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:amount => nil}}
-        response.should render_template("edit")
+        get 'update' , {:id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:amount => nil}}
+        expect(response).to render_template("edit")
       end
     end
   
@@ -135,8 +136,8 @@ module InPaymentSchedulex
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id, :last_updated_by_id => @u.id)
-        get 'show' , {:use_route => :in_payment_schedulex, :id => qs.id}
-        response.should be_success
+        get 'show' , {:id => qs.id}
+        expect(response).to be_success
       end
     end
   end

@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe "LinkTests" do
+RSpec.describe "LinkTests", type: :request do
   describe "GET /in_payment_schedulex_link_tests" do
     mini_btn = 'btn btn-mini '
     ActionView::CompiledTemplates::BUTTONS_CLS =
@@ -32,7 +32,7 @@ describe "LinkTests" do
       @u = FactoryGirl.create(:user, :user_levels => [ul], :user_roles => [ur])
       
       ua1 = FactoryGirl.create(:user_access, :action => 'index', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
-           :sql_code => "InPaymentSchedulex::ReceivingSchedule.scoped.order('pay_date DESC, paid_percentage')")
+           :sql_code => "InPaymentSchedulex::ReceivingSchedule.all.order('pay_date DESC, paid_percentage')")
       ua1 = FactoryGirl.create(:user_access, :action => 'create', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
            :sql_code => "")
       ua1 = FactoryGirl.create(:user_access, :action => 'update', :resource => 'in_payment_schedulex_receiving_schedules', :role_definition_id => @role.id, :rank => 1,
@@ -57,56 +57,56 @@ describe "LinkTests" do
       qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract.id)
       log = FactoryGirl.create(:commonx_log, :log => 'some logss', :resource_id => qs.id, :resource_name => 'in_payment_schedulex_receiving_schedules')
       
-      visit receiving_schedules_path
+      visit in_payment_schedulex.receiving_schedules_path
       save_and_open_page
       click_link qs.id.to_s
-      page.should have_content('Receiving Schedule Info')
-      page.should have_content('some logss')
+      expect(page).to have_content('Receiving Schedule Info')
+      expect(page).to have_content('some logss')
       click_link 'New Log'
-      page.should have_content('Log')
+      expect(page).to have_content('Log')
       #save_and_open_page
-      visit receiving_schedules_path() 
+      visit in_payment_schedulex.receiving_schedules_path() 
       save_and_open_page
       click_link 'Edit'
       #save_and_open_page
-      page.should have_content('Edit Receiving Schedule')
+      expect(page).to have_content('Edit Receiving Schedule')
       fill_in 'receiving_schedule_brief_note', :with => 'new name'
       click_button 'Save'
-      visit receiving_schedules_path()
+      visit in_payment_schedulex.receiving_schedules_path()
       click_link qs.id.to_s
-      page.should have_content('new name')
+      expect(page).to have_content('new name')
       #wrong data
-      visit receiving_schedules_path() 
+      visit in_payment_schedulex.receiving_schedules_path() 
       click_link 'Edit'
-      page.should have_content('Edit Receiving Schedule')
+      expect(page).to have_content('Edit Receiving Schedule')
       fill_in 'receiving_schedule_pay_date', :with => 10.days.ago
       click_button 'Save'
-      visit receiving_schedules_path()
+      visit in_payment_schedulex.receiving_schedules_path()
       click_link qs.id.to_s
       save_and_open_page
-      page.should_not have_content(10.days.ago)
+      expect(page).not_to have_content(10.days.ago)
       
-      visit receiving_schedules_path(:contract_id => @contract.id)
-      page.should have_content('Receiving Schedules')
+      visit in_payment_schedulex.receiving_schedules_path(:contract_id => @contract.id)
+      expect(page).to have_content('Receiving Schedules')
       click_link 'New Receiving Schedule'
-      page.should have_content('New Receiving Schedule')
+      expect(page).to have_content('New Receiving Schedule')
       fill_in 'receiving_schedule_pay_date', :with => Date.today
       fill_in 'receiving_schedule_amount', :with => 33333
       click_button 'Save'
-      visit receiving_schedules_path()
+      visit in_payment_schedulex.receiving_schedules_path()
       save_and_open_page
-      page.should have_content(Date.today.strftime('%Y/%m/%d'))
+      expect(page).to have_content(Date.today.strftime('%Y/%m/%d'))
       #wrong data
-      visit receiving_schedules_path(:contract_id => @contract.id)
-      page.should have_content('Receiving Schedules')
+      visit in_payment_schedulex.receiving_schedules_path(:contract_id => @contract.id)
+      expect(page).to have_content('Receiving Schedules')
       click_link 'New Receiving Schedule'
       save_and_open_page
-      page.should have_content('New Receiving Schedule')
+      expect(page).to have_content('New Receiving Schedule')
       fill_in 'receiving_schedule_pay_date', :with => 7.days.ago
       fill_in 'receiving_schedule_amount', :with => nil
       click_button 'Save'
-      visit receiving_schedules_path()
-      page.should_not have_content(7.days.ago.strftime('%Y/%m/%d'))
+      visit in_payment_schedulex.receiving_schedules_path()
+      expect(page).not_to have_content(7.days.ago.strftime('%Y/%m/%d'))
     end
   end
 end
