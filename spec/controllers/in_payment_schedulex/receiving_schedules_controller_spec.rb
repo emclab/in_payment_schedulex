@@ -20,6 +20,8 @@ module InPaymentSchedulex
       @cust1 = FactoryGirl.create(:kustomerx_customer, :name => 'new new', :short_name => 'n new')
       @contract = FactoryGirl.create(:multi_item_contractx_contract, :void => false, :last_updated_by_id => @u.id, :sales_id => @u.id, :customer_id => @cust.id, :contract_num => 'a new one')
       @contract1 = FactoryGirl.create(:multi_item_contractx_contract, :void => false, :last_updated_by_id => @u.id, :customer_id => @cust1.id)
+      
+      session[:user_role_ids] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id).user_role_ids
     end
       
     render_views
@@ -30,7 +32,6 @@ module InPaymentSchedulex
         :sql_code => "InPaymentSchedulex::ReceivingSchedule.all.order('pay_date DESC, paid_percentage')")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract.id)
         qs1 = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract1.id)
         get 'index' 
@@ -42,7 +43,6 @@ module InPaymentSchedulex
         :sql_code => "InPaymentSchedulex::ReceivingSchedule.all.order('pay_date DESC, paid_percentage')")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule,  :last_updated_by_id => @u.id, :contract_id => @contract.id)
         qs1 = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :last_updated_by_id => @u.id, :contract_id => @contract1.id)
         get 'index' , {:contract_id => @contract.id}
@@ -56,7 +56,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         get 'new' , {:contract_id => @contract.id}
         expect(response).to be_success
       end
@@ -69,7 +68,6 @@ module InPaymentSchedulex
         :sql_code => "record.sales_id == session[:user_id]")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.attributes_for(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id)
         get 'create' , { :receiving_schedule => qs, :contract_id => @contract.id, :parent_record_id => @contract.id, :parent_resource => 'multi_item_contractx/contracts'}
         expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
@@ -80,7 +78,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.attributes_for(:in_payment_schedulex_receiving_schedule, :amount => nil, :contract_id => @contract.id)
         get 'create' , {:receiving_schedule => qs, :contract_id => @contract1.id}
         expect(response).to render_template("new")
@@ -94,7 +91,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id)
         get 'edit' , {:id => qs.id, :contract_id => @contract1.id}
         expect(response).to be_success
@@ -109,7 +105,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule)
         get 'update' , {:id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:brief_note => 'true'}}
         expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
@@ -120,7 +115,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule)
         get 'update' , {:id => qs.id, :contract_id => @contract.id, :receiving_schedule => {:amount => nil}}
         expect(response).to render_template("edit")
@@ -134,7 +128,6 @@ module InPaymentSchedulex
         :sql_code => "")
         session[:employee] = true
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         qs = FactoryGirl.create(:in_payment_schedulex_receiving_schedule, :contract_id => @contract.id, :last_updated_by_id => @u.id)
         get 'show' , {:id => qs.id}
         expect(response).to be_success
