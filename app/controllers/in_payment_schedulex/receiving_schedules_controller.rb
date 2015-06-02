@@ -2,8 +2,8 @@ require_dependency "in_payment_schedulex/application_controller"
 
 module InPaymentSchedulex
   class ReceivingSchedulesController < ApplicationController
-    before_filter :require_employee
-    before_filter :load_parent_record
+    before_action :require_employee
+    before_action :load_parent_record
 
     def index
       @title = t('Receiving Schedules')
@@ -22,7 +22,7 @@ module InPaymentSchedulex
 
 
     def create
-      @receiving_schedule = InPaymentSchedulex::ReceivingSchedule.new(params[:receiving_schedule], :as => :role_new)
+      @receiving_schedule = InPaymentSchedulex::ReceivingSchedule.new(new_params)
       @receiving_schedule.last_updated_by_id = session[:user_id]
       if @receiving_schedule.save
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
@@ -44,7 +44,7 @@ module InPaymentSchedulex
     def update
       @receiving_schedule = InPaymentSchedulex::ReceivingSchedule.find_by_id(params[:id])
       @receiving_schedule.last_updated_by_id = session[:user_id]
-      if @receiving_schedule.update_attributes(params[:receiving_schedule], :as => :role_update)
+      if @receiving_schedule.update_attributes(edit_params)
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       else
         @erb_code = find_config_const('receiving_schedule_edit_view', 'in_payment_schedulex')
@@ -64,6 +64,16 @@ module InPaymentSchedulex
     def load_parent_record
       @contract = InPaymentSchedulex.contract_class.find_by_id(params[:contract_id]) if params[:contract_id].present? 
       @contract = InPaymentSchedulex.contract_class.find_by_id(InPaymentSchedulex::ReceivingSchedule.find_by_id(params[:id]).contract_id) if params[:id].present? 
+    end
+    
+    private
+    
+    def new_params
+      params.require(:receiving_schedule).permit(:amount, :brief_note, :contract_id, :paid_percentage, :pay_date, :payment_type_id, :paid_out)
+    end
+    
+    def edit_params
+      params.require(:receiving_schedule).permit(:amount, :brief_note, :paid_percentage, :pay_date, :payment_type_id, :pay_out_date, :paid_out)
     end
   end
 end

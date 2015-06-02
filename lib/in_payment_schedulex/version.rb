@@ -1,3 +1,3 @@
 module InPaymentSchedulex
-  VERSION = "3.2.12.02"
+  VERSION = "01"
 end

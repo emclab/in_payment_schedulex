@@ -4,7 +4,7 @@ module InPaymentSchedulex
   RSpec.describe ReceivingSchedulesController, type: :controller do
     routes {InPaymentSchedulex::Engine.routes}
     before(:each) do
-      expect(controller).to receive(:require_signin)
+      expect(controller).to receive(:require_employee)
     end
     before(:each) do
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)

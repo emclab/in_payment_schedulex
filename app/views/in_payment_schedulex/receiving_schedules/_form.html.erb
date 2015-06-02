@@ -2,6 +2,7 @@
   <%= render inline: @erb_code %>
   
   <% else %>
+  <h4><%= t(@title) %></h4>
 <%= simple_form_for(@receiving_schedule) do |f| %>
     <%= f.input :contract_id_noupdate, :label => t('Contract#'), :readonly => true, :input_html => {:value => @contract.id} %>
     <%= f.input :pay_date, :label => t('Pay Date'), :as => :string %>
