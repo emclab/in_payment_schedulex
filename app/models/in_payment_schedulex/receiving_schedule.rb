@@ -1,18 +1,7 @@
 module InPaymentSchedulex
   class ReceivingSchedule < ActiveRecord::Base
     attr_accessor :last_update_by_name, :payment_type, :cancelled_noupdate, :contract_id_noupdate, :paid_out_noupdate
-=begin
-    attr_accessible :amount, :brief_note, :contract_id, :paid_percentage, :pay_date, :payment_type_id, :paid_out,
-                    :as => :role_new
-    attr_accessible :amount, :brief_note, :paid_percentage, :pay_date, :payment_type_id, :pay_out_date, :paid_out, :paid_out_noupdate,
-                    :contract_id_noupdate,
-                    :as => :role_update
-    
-    attr_accessor :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :paid_percentage_s, :time_frame_s, :paid_out_s, :sales_id_s
-
-    attr_accessible :contract_id_s, :start_date_s, :end_date_s, :customer_id_s, :payment_type_id_s, :time_frame_s, :paid_percentage_s, :paid_out_s, :sales_id_s,
-                    :as => :role_search_stats
-=end                                    
+                                   
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
     belongs_to :contract, :class_name => InPaymentSchedulex.contract_class.to_s
     belongs_to :payment_type, :class_name => 'Commonx::MiscDefinition'
